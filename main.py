@@ -73,7 +73,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(help_text)
 
 def get_ydl_opts(temp_dir):
-    """Настройки для yt-dlp"""
+    """Настройки для yt-dlp с продвинутым обходом блокировок"""
     return {
         'format': 'bestaudio/best',
         'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
@@ -86,19 +86,31 @@ def get_ydl_opts(temp_dir):
         'no_warnings': True,
         'max_filesize': MAX_FILE_SIZE,
         'socket_timeout': 30,
+        # Продвинутые настройки обхода
         'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-us,en;q=0.5',
-            'Accept-Encoding': 'gzip,deflate',
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
             'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
         },
         'extractor_args': {
             'youtube': {
                 'skip': ['hls', 'dash'],
-                'player_client': ['android', 'web']
+                'player_client': ['android', 'ios', 'web'],
+                'player_skip': ['configs'],
+                'comment_sort': ['top'],
+                'max_comments': ['0']
             }
-        }
+        },
+        # Дополнительные обходы
+        'sleep_interval_requests': 1,
+        'sleep_interval_subtitles': 1,
+        'age_limit': 18,
+        'geo_bypass': True,
+        'geo_bypass_country': 'US'
     }
 
 def download_audio_sync(url, temp_dir):
